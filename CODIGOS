@@ -1,0 +1,63 @@
+create table veiculo(
+    placa varchar(8) primary key,
+    veiculo varchar(120),
+    cor varchar(60)
+);
+
+create table cliente(
+    cpf varchar(14) primary key,
+    cliente varchar(120),
+    nascimento date
+);
+
+create table locação(
+    id int primary key auto_increment,
+    diaria double,
+    dias int,
+    total double generated always as (diaria*dias) stored,
+    idcliente varchar(14),
+    idveiculo varchar(8),
+    foreign key (idcliente) references cliente(cpf),
+    foreign key (idveiculo) references veiculo(placa)
+);
+
+insert into veiculo (veiculo, cor, placa) values
+    ('Gol', 'Branco', 'ABC-1234'),
+    ('Palio', 'Prata', 'DEF-5678'),
+    ('Onix', 'Preto', 'GHI-9101'),
+    ('HB20', 'Vermelho', 'JKL-2345'),
+    ('Creta', 'Azul', 'MNO-6789');
+
+insert into cliente (cliente, cpf, nascimento) values
+    ('João Silva', '111.222.333-44', '1990-05-15'),
+    ('Maria Santos', '222.333.444-55', '1985-08-20'),
+    ('José Oliveira', '333.444.555-66', '1978-03-10'),
+    ('Ana Souza', '444.555.666-77', '1995-11-27'),
+    ('Pedro Costa', '555.666.777-88', '1980-09-03');
+
+insert into locação (diaria, dias, idcliente, idveiculo) values
+    (40.00, 5, '111.222.333-44', 'ABC-1234'),
+    (50.00, 7, '222.333.444-55', 'DEF-5678'),
+    (45.00, 3, '333.444.555-66', 'GHI-9101'),
+    (35.00, 4, '444.555.666-77', 'JKL-2345'),
+    (55.00, 6, '555.666.777-88', 'MNO-6789');
+
+create view LocaçãoId as
+    select l.id, l.total, c.cliente, v.veiculo
+    from locação l
+    inner join cliente c on l.idcliente = c.cpf
+    inner join veiculo v on l.idveiculo = v.placa;
+
+select * from LocaçãoId;
+
+Resultado do último comando SELECT:
+
++----+--------+--------------+-------+
+| id | total  | cliente      | veiculo |
++----+--------+--------------+-------+
+|  1 | 200.00 | João Silva   | Gol     |
+|  2 | 350.00 | Maria Santos | Palio   |
+|  3 | 135.00 | José Oliveira| Onix    |
+|  4 | 140.00 | Ana Souza    | HB20    |
+|  5 | 330.00 | Pedro Costa  | Creta   |
++----+--------+--------------+-------+
